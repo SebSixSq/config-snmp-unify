@@ -1,6 +1,14 @@
+auths:
+  public_v1:
+    version: 1
+    community: public
+  public_v2:
+    version: 2
+    community: public
+
 modules:
   # Default IF-MIB interfaces table with ifIndex.
-  if_mib_if_name:
+  if_mib:
     walk: [sysUpTime, interfaces, ifXTable]
     lookups:
       - source_indexes: [ifIndex]
@@ -20,17 +28,20 @@ modules:
         ignore: true # Lookup metric
       ifType:
         type: EnumAsInfo
-    auth:
-      community: public
+  # Default IP-MIB with ipv4InterfaceTable for example.
+  ip_mib:
+    walk: [ipv4InterfaceTable]
 
+# Ubiquiti / UniFi
+#
+# http://dl.ubnt-ut.com/snmp/UBNT-MIB
+# http://dl.ubnt-ut.com/snmp/UBNT-UniFi-MIB
+#
   ubiquiti_unifi:
     walk:
-      - sysUpTime
-      - interfaces
-      - ifXTable
       - 1.3.6.1.4.1.41112.1.6 # ubntUniFi
-    overrides:
-      ifType:
-        type: EnumAsInfo
-    auth:
-      community: public 
+    lookups:
+      - source_indexes: [unifiVapIndex]
+        lookup: unifiVapName
+      - source_indexes: [unifiVapIndex]
+        lookup: unifiVapEssId
